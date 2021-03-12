@@ -111,7 +111,7 @@ def plot_absorption(path):
     plt.show()
 
 
-def plot_transitdepth(path) :             
+def plot_transitdepth(path, day=0):             
             
     files = glob.glob(str(path) + 'spectra/*.txt')    
     
@@ -125,7 +125,7 @@ def plot_transitdepth(path) :
     wavelengths = []
     first_file = open(files[0], 'r')
     rad_spectrum = first_file.readlines()
-    rad_spectrum = rad_spectrum[701:899]
+    rad_spectrum = rad_spectrum[658:856]
     for item in rad_spectrum:
         datapoints = item.split('  ')
         wavelength = float(datapoints[0])
@@ -137,30 +137,42 @@ def plot_transitdepth(path) :
     noise = pd.DataFrame(index=number_of_rows, columns=number_of_columns)
     stellar = pd.DataFrame(index=number_of_rows, columns=number_of_columns)
     planet = pd.DataFrame(index=number_of_rows, columns=number_of_columns)
+    transit = pd.DataFrame(index=number_of_rows, columns=number_of_columns)
+    blocked = pd.DataFrame(index=number_of_rows, columns=number_of_columns)
     
     for file_number in range(0,len(files)):
         data = open(files[file_number], 'r')
         lines = data.readlines()
-        lines = lines[701:899]
+        lines = lines[658:856]
         data.close()
 
         for row in range(0,198):
+            lines[row] = lines[row].replace(' -', '  ')
             list_of_datapoints = lines[row].split('  ')
             total_spectrum.loc[row, file_number] = float(list_of_datapoints[1])
             noise.loc[row, file_number] = float(list_of_datapoints[2])
             stellar.loc[row, file_number] = float(list_of_datapoints[3])
             planet.loc[row, file_number] = float(list_of_datapoints[4])
+            transit.loc[row, file_number] = float(list_of_datapoints[5])
+            blocked.loc[row, file_number] = float(list_of_datapoints[6])
 
     meaned_total_spectrum = total_spectrum.mean(axis=1).to_numpy()
     meaned_noise = noise.mean(axis=1).to_numpy()
     meaned_stellar = stellar.mean(axis=1).to_numpy()
     meaned_planet = planet.mean(axis=1).to_numpy()
-    transit_depth =  1 - (meaned_planet + meaned_stellar - meaned_total_spectrum - meaned_noise) / (meaned_stellar + meaned_planet)
+    meaned_transit = transit.mean(axis=1).to_numpy()
+    meaned_blocked = blocked.mean(axis=1).to_numpy()
     
-    plt.plot(x_axis, transit_depth)
+    with open(str(path) + 'output/transit_day%s.txt' %(day), 'w') as file:
+        file.write(str(x_axis) + '\n')
+        file.write(str(meaned_transit) + '\n')                              
+    file.close()
+    
+    plt.plot(x_axis, meaned_transit)
     plt.title('Relative transit depth')
     plt.xlabel('Wavelength [um]')
+#    plt.xlim(1,5)
     plt.ylabel('$(R_p/R_{star})^2$')
 #    plt.ylim([0,1])
     plt.show()
-    
+ 

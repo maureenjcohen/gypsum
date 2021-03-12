@@ -20,7 +20,9 @@ import numpy as np
 import pandas as pd
 import glob
 
-templatepath = 'placeholder'
+
+templatepath = '/exports/csce/datastore/geos/users/s1144983/psg_files/templates'
+
 
 def write_config(path, cubes, day, coords=(-1,45,36)):
     
@@ -52,7 +54,7 @@ def write_config(path, cubes, day, coords=(-1,45,36)):
     altitude = air_pressure.coord('level_height').points*1e-3
     # Extract altitude of T-P points from air pressure cube (in km)
     
-    converted_pressure = air_pressure[day,:,coords[1],coords[2]].data*1e-5 # Convert Pa to bar
+    converted_pressure = air_pressure[day,:,coords[1],coords[2]].data
     absolute_temp = absolute_temp[day,:,coords[1],coords[2]].data
     vapour = (28.0134/18.01528)*spec_humid[day,:,coords[1],coords[2]].data # Convert kg/kg to molecules/molecules
     # Extract the numpy array for only the column we are looking at (much faster than extracting the full array!)
@@ -68,7 +70,7 @@ def write_config(path, cubes, day, coords=(-1,45,36)):
     template.close()
     # Open template PSG config file that already has ProxB planetary data in it, read lines into a list
     
-    for layer in range(0,39):
+    for layer in range(0,60):
         line_index = 55+layer # Atmosphere layers begin at line 55 of the template
         list_in[line_index] = list_in[line_index].rstrip() # Strip \n from end of line
         list_out[line_index] = list_in[line_index] + f"{converted_pressure[layer]:.4E}" + ',' + \
