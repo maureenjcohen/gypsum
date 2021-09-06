@@ -162,17 +162,25 @@ def plot_transitdepth(path, day=0):
     meaned_planet = planet.mean(axis=1).to_numpy()
     meaned_transit = transit.mean(axis=1).to_numpy()
     meaned_blocked = blocked.mean(axis=1).to_numpy()
+    continuum = np.min(meaned_transit)
     
     with open(str(path) + 'output/transit_day%s.txt' %(day), 'w') as file:
         file.write(str(x_axis) + '\n')
         file.write(str(meaned_transit) + '\n')                              
     file.close()
     
-    plt.plot(x_axis, meaned_transit)
-    plt.title('Relative transit depth')
+    plt.plot(x_axis, (meaned_transit-continuum)*1e6)
+    plt.title('Relative transit depth, day=%s' %(day+1))
     plt.xlabel('Wavelength [um]')
+    plt.ylabel('Relative transit depth [ppm]')
+    plt.annotate('H20', xy=(1.9507,8), xytext=(0, 3), textcoords='offset points')
+    plt.annotate('H20', xy=(1.4330,3), xytext=(0, 3), textcoords='offset points')
+    plt.annotate('H20', xy=(2.6293,4), xytext=(0, 2), textcoords='offset points')
+    plt.annotate('CO2', xy=(4.3250,20), xytext=(8, 2), textcoords='offset points')
+    plt.annotate('CO2', xy=(2.0099,15), xytext=(1, 1), textcoords='offset points')
+    plt.annotate('CO2', xy=(2.7089,20), xytext=(8, 2), textcoords='offset points')
 #    plt.xlim(1,5)
-    plt.ylabel('$(R_p/R_{star})^2$')
+#    plt.ylabel('$(R_p/R_{star})^2$')
 #    plt.ylim([0,1])
     plt.show()
  

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Fri Feb 12 10:05:06 2021
+Created on Sat Sep  4 09:37:44 2021
 
 @author: Mo Cohen
 
@@ -41,10 +41,7 @@ def write_config(daypath, cubes, day, coords=(-1,45,36)):
             potential_temp = cube.copy()
         if cube.standard_name == 'specific_humidity':
             spec_humid = cube.copy()
-        if cube.standard_name == 'mass_fraction_of_cloud_ice_in_air':
-            ice_cloud = cube.copy()
-        if cube.standard_name == 'mass_fraction_of_cloud_liquid_water_in_air':
-            liquid_cloud = cube.copy()
+
     # Extract the model data cubes needed
         
     p0 = iris.coords.AuxCoord(100000.0, long_name='reference_pressure', units='Pa')
@@ -62,10 +59,8 @@ def write_config(daypath, cubes, day, coords=(-1,45,36)):
     
     CO2 = np.full(vapour.shape,(28.0134/44.0095)*5.94e-4) # Model has a fixed amount of CO2. Convert kg/kg to molecules/molecules
     N2 = np.ones(vapour.shape) - vapour - CO2 # Any gas that isn't vapour or CO2 is N2
-    liquid_cloud = liquid_cloud[day,:,coords[1],coords[2]].data
-    ice_cloud = ice_cloud[day,:,coords[1],coords[2]].data
 
-    template = open(str(templatepath) + '/proxb_template.txt','r')    
+    template = open(str(templatepath) + '/proxb_vapour.txt','r')    
     list_in = template.readlines()
     list_out = list_in.copy()
     template.close()
@@ -76,10 +71,10 @@ def write_config(daypath, cubes, day, coords=(-1,45,36)):
         list_in[line_index] = list_in[line_index].rstrip() # Strip \n from end of line
         list_out[line_index] = list_in[line_index] + f"{converted_pressure[layer]:.4E}" + ',' + \
         f"{absolute_temp[layer]:.4E}" + ',' + f"{altitude[layer]:.4E}" + ',' + f"{N2[layer]:.4E}" + ',' + f"{vapour[layer]:.4E}" + ',' + \
-        f"{CO2[layer]:.4E}" + ',' + f"{liquid_cloud[layer]:.4E}" + ',' + f"{ice_cloud[layer]:.4E}" + '\n'
-        # For each atmosphere layer, add pressure, temperature, N2, H2O, CO2, liquid cloud, and ice cloud data point
+        f"{CO2[layer]:.4E}" + '\n'
+        # For each atmosphere layer, add pressure, temperature, N2, H2O, CO2 data point
         # Format in scientific notation to 4 decimal places, capital E
-#    print(list_out) # Print to check your list formatting matches examples
+    print(list_out) # Print to check your list formatting matches examples
     
     with open(str(daypath) + 'configfiles/config_%s_%s.txt' %(coords[1], coords[2]), 'w') as file:
         for line in list_out:
