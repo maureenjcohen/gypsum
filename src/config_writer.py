@@ -65,13 +65,13 @@ def write_config(daypath, cubes, day, coords=(-1,45,36)):
     liquid_cloud = liquid_cloud[day,:,coords[1],coords[2]].data
     ice_cloud = ice_cloud[day,:,coords[1],coords[2]].data
 
-    template = open(str(templatepath) + '/proxb_template.txt','r')    
+    template = open(str(templatepath) + '/trape_template.txt','r')    
     list_in = template.readlines()
     list_out = list_in.copy()
     template.close()
     # Open template PSG config file that already has ProxB planetary data in it, read lines into a list
     
-    for layer in range(0,60):
+    for layer in range(0,38):
         line_index = 55+layer # Atmosphere layers begin at line 55 of the template
         list_in[line_index] = list_in[line_index].rstrip() # Strip \n from end of line
         list_out[line_index] = list_in[line_index] + f"{converted_pressure[layer]:.4E}" + ',' + \
@@ -103,25 +103,25 @@ def day_generator(daypath, cubes, day=-1):
         
     for latitude in range(0,90):
         east_config = write_config(daypath, cubes, day, coords=(-1, latitude, 36))
-        east_filename = str(daypath) + 'configfiles/config_%s_36.txt' %(latitude)
-        east_cmd = 'curl -d type=all -d whdr=y --data-urlencode file@%s https://psg.gsfc.nasa.gov/api.php' %(east_filename)
-        with open(str(daypath) + 'spectra/trn_%s_36.txt' %(latitude), 'w') as file:
-            subprocess.run(east_cmd, shell=True, stdout=file)
-        file.close()
+        # east_filename = str(daypath) + 'configfiles/config_%s_36.txt' %(latitude)
+        # east_cmd = 'curl -d type=all -d whdr=y --data-urlencode file@%s https://psg.gsfc.nasa.gov/api.php' %(east_filename)
+        # with open(str(daypath) + 'spectra/trn_%s_36.txt' %(latitude), 'w') as file:
+        #     subprocess.run(east_cmd, shell=True, stdout=file)
+        # file.close()
         
         west_config = write_config(daypath, cubes, day, coords=(-1, latitude, 108))
-        west_filename = str(daypath) + 'configfiles/config_%s_108.txt' %(latitude)
-        west_cmd = 'curl -d type=all -d whdr=y --data-urlencode file@%s https://psg.gsfc.nasa.gov/api.php' %(west_filename)
-        with open(str(daypath) + 'spectra/trn_%s_108.txt' %(latitude), 'w') as file:
-            subprocess.run(west_cmd, shell=True, stdout=file)
-        file.close()
+        # west_filename = str(daypath) + 'configfiles/config_%s_108.txt' %(latitude)
+        # west_cmd = 'curl -d type=all -d whdr=y --data-urlencode file@%s https://psg.gsfc.nasa.gov/api.php' %(west_filename)
+        # with open(str(daypath) + 'spectra/trn_%s_108.txt' %(latitude), 'w') as file:
+        #     subprocess.run(west_cmd, shell=True, stdout=file)
+        # file.close()
         print('Up to latitude: ' + str(latitude))
             
 
 def batch_job(parentpath, cubes, first, last): 
     
     for day in range(first,last+1):
-        daypath = str(parentpath) + 'tall_day%s/' %(day)
+        daypath = str(parentpath) + 'trap_day%s/' %(day)
         Path(str(daypath)).mkdir(exist_ok=True)
         day_generator(daypath, cubes, day=day)
 #        plot_transitdepth(daypath, day=day)
