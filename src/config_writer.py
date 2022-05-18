@@ -72,7 +72,7 @@ def write_config(daypath, cubes, day, coords=(-1,45,36)):
     # Open template PSG config file that already has ProxB planetary data in it, read lines into a list
     
     for layer in range(0,38):
-        line_index = 55+layer # Atmosphere layers begin at line 55 of the template
+        line_index = 54+layer # Atmosphere layers begin at line 54 of the template
         list_in[line_index] = list_in[line_index].rstrip() # Strip \n from end of line
         list_out[line_index] = list_in[line_index] + f"{converted_pressure[layer]:.4E}" + ',' + \
         f"{absolute_temp[layer]:.4E}" + ',' + f"{altitude[layer]:.4E}" + ',' + f"{N2[layer]:.4E}" + ',' + f"{vapour[layer]:.4E}" + ',' + \
@@ -115,7 +115,7 @@ def day_generator(daypath, cubes, day=-1):
         # with open(str(daypath) + 'spectra/trn_%s_108.txt' %(latitude), 'w') as file:
         #     subprocess.run(west_cmd, shell=True, stdout=file)
         # file.close()
-        print('Up to latitude: ' + str(latitude))
+        print('Up to latitude: ' + str(latitude) + ' on day: ' + str(day))
             
 
 def batch_job(parentpath, cubes, first, last): 
